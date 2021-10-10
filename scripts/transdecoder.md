@@ -14,3 +14,16 @@
 
 ##### and we call it as follows:
 `ls longest_orfs.pep.* | parallel -j55 -k bash hmscan.sh {}`
+
+##### because the resultant files have a header we need to cut this and then cat these files; see trim_header.sh and use the same as hmmscan.sh
+```
+ls *.pfam.domtblout | parallel -j12 -k bash trim_headers.sh {}
+cat *.out > compile.pfam.domtblout
+head -n 3 longest_orfs.pep.000.pfam.domtblout | cat - compile.pfam.domtblout > pfam.transcripts.domtblout
+```
+
+##### now we can finish up the Transdecoder pipeline ande get our target proteins
+```
+TransDecoder.Predict -t transcripts.fasta --retain_pfam_hits pfam.transcripts.domtblout \
+  --retain_blastp_hits diamond.agrostemma.outfmt6
+```
